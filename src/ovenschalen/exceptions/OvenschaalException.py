@@ -1,0 +1,2 @@
+class OvenschaalException(Exception):
+    pass

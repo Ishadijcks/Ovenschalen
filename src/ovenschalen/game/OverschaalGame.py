@@ -21,7 +21,7 @@ class OvenschaalGame:
         self.schaal = Ovenschaal()
 
     def start(self) -> Player:
-        """Start a game of ovenschalen and return the winner"""
+        """Start a game of ovenschalen and return the winner or loser depending on the config"""
         self.schaal = Ovenschaal()
 
         print("Simulating game between", ' and '.join(map(lambda p: str(p), self.players)))
@@ -49,6 +49,7 @@ class OvenschaalGame:
             self.turns += 1
             if self.turns == len(self.players):
                 self.is_first_round = False
+
             self.print_state()
             self.next_turn()
 
@@ -58,6 +59,12 @@ class OvenschaalGame:
         raise NoWinnerException()
 
     def is_game_over(self) -> bool:
+        # Sanity check
+        players_below_zero = len(list(filter(lambda player: player.dice_count < 0, self.players)))
+        if players_below_zero > 0:
+            self.print_state()
+            exit(1)
+
         players_with_zero = len(list(filter(lambda player: player.dice_count == 0, self.players)))
         if self.config.play_to_win:
             return players_with_zero > 0
@@ -90,17 +97,17 @@ class OvenschaalGame:
         self.schaal.add(die)
 
         duplicates = self.schaal.process_state()
-        if self.is_first_round:
+        if duplicates > 0:
+            # We got duplicates, turn is over
+            current_player.gain_dice(duplicates)
+            return
+        if self.is_first_round or current_player.dice_count == 0:
             return
 
         if die == 6 and not self.is_game_over():
             self.process_turn()
             return
 
-        if duplicates > 0:
-            # We got duplicates, turn is over
-            current_player.gain_dice(duplicates)
-            return
         if self.is_game_over():
             return
 

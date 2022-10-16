@@ -4,7 +4,7 @@ from typing import List
 from ovenschalen.game.OvenschaalConfig import OvenschaalConfig
 from ovenschalen.game.OverschaalGame import OvenschaalGame
 from ovenschalen.game.Player import Player
-from ovenschalen.plot.Plot import wins_barchart
+from ovenschalen.plot.Plot import results_barchart
 
 
 class AbstractBenchmark(ABC):
@@ -15,14 +15,13 @@ class AbstractBenchmark(ABC):
         self.rounds = rounds
 
     def simulate(self, config: OvenschaalConfig):
-        win_counts = {}
+        result_counts = {}
         for player in self.players:
-            win_counts[player.name] = 0
+            result_counts[player.name] = 0
 
         for i in range(self.rounds):
             game = OvenschaalGame(self.players, config)
-            winner = game.start()
-            win_counts[winner.name] += 1
+            player = game.start()
+            result_counts[player.name] += 1
 
-        wins_barchart(win_counts)
-        print(win_counts)
+        results_barchart(result_counts, config)

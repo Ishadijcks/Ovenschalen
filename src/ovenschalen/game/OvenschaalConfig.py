@@ -1,5 +1,8 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class OvenschaalConfig:
-    def __init__(self,
-                 dice_count=5
-                 ) -> None:
-        self.dice_count = dice_count
+    dice_count: int = 5
+    randomize_player_order: bool = True
+    first_player_starts: bool = False

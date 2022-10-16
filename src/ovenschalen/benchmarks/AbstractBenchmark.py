@@ -14,13 +14,13 @@ class AbstractBenchmark(ABC):
         self.players = [player] + opponents
         self.rounds = rounds
 
-    def simulate(self):
+    def simulate(self, config: OvenschaalConfig):
         win_counts = {}
         for player in self.players:
             win_counts[player.name] = 0
 
         for i in range(self.rounds):
-            game = OvenschaalGame(self.players, OvenschaalConfig())
+            game = OvenschaalGame(self.players, config)
             winner = game.start()
             win_counts[winner.name] += 1
 

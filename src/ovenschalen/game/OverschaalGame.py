@@ -15,6 +15,9 @@ class OvenschaalGame:
         self.players = players
         self.config = config
         self.current_player = 0
+        self.is_first_round = True
+        self.turns = 0
+        self.rolls = 0
         self.schaal = Ovenschaal()
 
     def start(self) -> Player:
@@ -25,10 +28,21 @@ class OvenschaalGame:
         # Configure the players so the game can start
         for player in self.players:
             player.start_game(self.config.dice_count)
-        self.current_player = random.randint(0, len(self.players) - 1)
+
+        # Set starting player
+        if self.config.first_player_starts:
+            self.current_player = 0
+        else:
+            self.current_player = random.randint(0, len(self.players) - 1)
+
+        if self.config.randomize_player_order:
+            random.shuffle(self.players)
 
         while not self.is_game_won():
             self.process_turn()
+            self.turns += 1
+            if self.turns == len(self.players):
+                self.is_first_round = False
             self.next_turn()
             self.print_state()
 
@@ -53,7 +67,8 @@ class OvenschaalGame:
     def print_state(self):
         print(self.get_state())
 
-    def throw_die(self) -> int:
+    def roll(self) -> int:
+        self.rolls += 1
         # TODO make dice customizable as well
         return random.randint(1, 6)
 
@@ -61,18 +76,20 @@ class OvenschaalGame:
         current_player: Player = self.players[self.current_player]
 
         # First toss is forced
-        die = self.throw_die()
+        die = self.roll()
         print(f"{current_player.name} rolled a {die}", end=' / ')
 
         current_player.throw_die()
         self.schaal.add(die)
 
-        # TODO check if you need to rethrow after every 6
+        duplicates = self.schaal.process_state()
+        if self.is_first_round:
+            return
+
         if die == 6 and not self.is_game_won():
             self.process_turn()
             return
 
-        duplicates = self.schaal.process_state()
         if duplicates > 0:
             # We got duplicates, turn is over
             current_player.gain_dice(duplicates)

@@ -8,8 +8,8 @@ from src.ovenschalen.strategies.AlwaysThrowStrategy import AlwaysThrowStrategy
 def main():
     benchmark = UpToNBenchmark(
         player=Player("Always", AlwaysThrowStrategy()),
-        rounds=10000,
-        opponent_count=8,
+        rounds=1,
+        opponent_count=2,
     )
     benchmark.simulate(config=OvenschaalConfig(
         dice_count=5,

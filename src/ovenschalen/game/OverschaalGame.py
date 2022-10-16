@@ -38,24 +38,31 @@ class OvenschaalGame:
         if self.config.randomize_player_order:
             random.shuffle(self.players)
 
-        while not self.is_game_won():
+        while not self.is_game_over():
+            # Skip already finished players
+            current_player: Player = self.players[self.current_player]
+            if current_player.dice_count == 0:
+                self.next_turn()
+                continue
+
             self.process_turn()
             self.turns += 1
             if self.turns == len(self.players):
                 self.is_first_round = False
-            self.next_turn()
             self.print_state()
+            self.next_turn()
 
         for player in self.players:
             if player.dice_count == 0:
                 return player
         raise NoWinnerException()
 
-    def is_game_won(self) -> bool:
-        for player in self.players:
-            if player.dice_count == 0:
-                return True
-        return False
+    def is_game_over(self) -> bool:
+        players_with_zero = len(list(filter(lambda player: player.dice_count == 0, self.players)))
+        if self.config.play_to_win:
+            return players_with_zero > 0
+        else:
+            return players_with_zero == len(self.players) - 1
 
     def get_state(self) -> OvenschaalState:
         return OvenschaalState(
@@ -86,7 +93,7 @@ class OvenschaalGame:
         if self.is_first_round:
             return
 
-        if die == 6 and not self.is_game_won():
+        if die == 6 and not self.is_game_over():
             self.process_turn()
             return
 
@@ -94,7 +101,7 @@ class OvenschaalGame:
             # We got duplicates, turn is over
             current_player.gain_dice(duplicates)
             return
-        if self.is_game_won():
+        if self.is_game_over():
             return
 
         action = current_player.process_turn(self.get_state())

@@ -1,6 +1,7 @@
 import random
 from typing import List
 
+from ovenschalen.exceptions.NegativeDiceException import NegativeDiceException
 from ovenschalen.exceptions.NoWinnerException import NoWinnerException
 from ovenschalen.game.Ovenschaal import Ovenschaal
 from ovenschalen.game.OvenschaalState import OvenschaalState
@@ -63,7 +64,7 @@ class OvenschaalGame:
         players_below_zero = len(list(filter(lambda player: player.dice_count < 0, self.players)))
         if players_below_zero > 0:
             self.print_state()
-            exit(1)
+            raise NegativeDiceException()
 
         players_with_zero = len(list(filter(lambda player: player.dice_count == 0, self.players)))
         if self.config.play_to_win:

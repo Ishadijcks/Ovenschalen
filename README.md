@@ -12,6 +12,21 @@ It also provides a set of benchmarks to test custom strategies against.
 
 Do you have what it takes to write the best AI and beat all your friends at _Ovenschalen_?
 
+## Example usage
+```py
+benchmark = UpToNBenchmark(
+    player=Player("Isha", AlwaysThrowStrategy()),
+    rounds=100,
+    opponent_count=2,
+)
+benchmark.simulate(config=OvenschaalConfig(
+    dice_count=5,
+    randomize_player_order=True,
+    first_player_starts=False,
+    play_to_win=False
+))
+```
+
 ## Project setup
 
 ### Clone the repository
